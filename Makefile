@@ -1,5 +1,6 @@
 # Makefile
 
+<<<<<<< HEAD
 # 파일명을 입력 (확장자 빼고)
 FILE1=main
 
@@ -12,7 +13,7 @@ LIBS=
 all: $(FILE1)
 
 $(FILE1):	$(FILE1).c
-	$(CC) $(FILE1).c -o $(FILE1)
+	$(CC) $(FILE1).c -o top
 
 c:
 	rm -f $(OBJS) output core

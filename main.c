@@ -9,7 +9,6 @@
 #include <sys/types.h>
 
 void openPsinfo(int pid);
-void openCmdline(int pid);
 
 int main(void) {
 	DIR *dp;
