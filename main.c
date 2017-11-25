@@ -17,8 +17,7 @@ typedef struct top{
 	int pid;
 	int lwp;
 	char command[64];
-	int t_hour;
-	int t_min;
+	char time[8];
 	int size;
 	int res;
 }top_data;
@@ -43,7 +42,7 @@ int main(void) {
 		printf("PID:%d ", data[pid].pid);
 		printf("LWP:%d COMMAND:%s ", data[pid].lwp, data[pid].command);
 		printf("SIZE:%d RES:%d ", data[pid].size, data[pid].res);
-		printf("time: %d:%d\n", data[pid].t_hour, data[pid].t_min);
+		printf("time: %s\n", data[pid].time);
 	}
 
     if(closedir(dp) < 0) {
@@ -68,6 +67,7 @@ top_data openPsinfo(int pid)
 	char *dmodel;
 	timestruc_t time;
 	int hour, min;
+	char t_result[8];
 
 	memset(&data, 0, sizeof(psinfo_t));
 	sprintf(fileName, "/proc/%d/psinfo", pid);
@@ -85,14 +85,17 @@ top_data openPsinfo(int pid)
 	time = data.pr_time;
 	hour = time.tv_sec / 60;
 	min = time.tv_sec % 60;
+	if(min < 10)
+		sprintf(t_result, "%d:0%d", hour, min);
+	else 
+		sprintf(t_result, "%d:%d", hour, min);
 
 	t_data.pid = pid;
 	t_data.lwp = (int)lwp;
 	t_data.size = (int)size;
 	t_data.res = (int)res;
-	t_data.t_hour = (int)hour;
-	t_data.t_min = (int)min;
 	strcpy(t_data.command, command);
+	strcpy(t_data.time, t_result);
 	close(fd);
 
 	return t_data;
