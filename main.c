@@ -7,10 +7,15 @@
 #include <procfs.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/param.h>
+#include <sys/syscall.h>
+#include <sys/uio.h>
 
 void openPsinfo(int pid);
+void openStatus(int pid);
 
 int main(void) {
+	int pid;
 	DIR *dp;
 	struct dirent *dent;
     char dirName[] = "/proc";
@@ -23,8 +28,9 @@ int main(void) {
 
 	while((dent=readdir(dp)))
 	{
-		printf("PID : %d ", atoi(dent->d_name));
-		openPsinfo(atoi(dent->d_name));
+		pid = atoi(dent->d_name);
+		printf("PID : %d ", pid);
+		openPsinfo(pid);
 	}
 
     if(closedir(dp) < 0) {
@@ -43,6 +49,7 @@ void openPsinfo(int pid)
 	psinfo_t data;
 	int lwp=0;
 	char *command;
+	int size, res;
 
 	memset(&data, 0, sizeof(psinfo_t));
 	sprintf(fileName, "/proc/%d/psinfo", pid);
@@ -54,7 +61,10 @@ void openPsinfo(int pid)
 
 	lwp = data.pr_nlwp;
 	command=data.pr_fname;
+	size = data.pr_size;
+	res = data.pr_rssize;
 
-	printf("LWP : %d COMMAND : %s\n", lwp, command);
+	printf("LWP : %d COMMAND : %s ", lwp, command);
+	printf("SIZE : %d RES : %d\n", size, res);
 	close(fd);
 }
