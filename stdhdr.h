@@ -10,3 +10,13 @@
 #include <sys/param.h>
 #include <sys/syscall.h>
 #include <sys/uio.h>
+
+//화면에 보여줄 top 구조체 요소.
+typedef struct top{
+	int pid;
+	int lwp;
+	char command[64];
+	char time[8];
+	int size;
+	int res;
+} topData;
