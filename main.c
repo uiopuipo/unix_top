@@ -11,11 +11,21 @@
 #include <sys/syscall.h>
 #include <sys/uio.h>
 
-void openPsinfo(int pid);
-void openStatus(int pid);
+struct top openPsinfo(int pid);
+
+typedef struct top{
+	int pid;
+	int lwp;
+	char command[64];
+	int t_hour;
+	int t_min;
+	int size;
+	int res;
+}top_data;
 
 int main(void) {
 	int pid;
+	struct top data[65535];
 	DIR *dp;
 	struct dirent *dent;
     char dirName[] = "/proc";
@@ -23,32 +33,36 @@ int main(void) {
 	dp = opendir(dirName);
     if(dp == NULL) {
 		printf("ERROR: Could not open directory(%s).\n", dirName);
-		exit(10);
+		exit(1);
 	}
 
 	while((dent=readdir(dp)))
 	{
 		pid = atoi(dent->d_name);
-		printf("PID : %d ", pid);
-		openPsinfo(pid);
+		data[pid] = openPsinfo(pid);
+		printf("PID:%d ", data[pid].pid);
+		printf("LWP:%d COMMAND:%s ", data[pid].lwp, data[pid].command);
+		printf("SIZE:%d RES:%d ", data[pid].size, data[pid].res);
+		printf("time: %d:%d\n", data[pid].t_hour, data[pid].t_min);
 	}
 
     if(closedir(dp) < 0) {
 		printf("ERROR: Could not close directory(%s).\n", dirName);
-		exit(10);
+		exit(2);
 	}
 
-	exit(0);
+	return 0;
 }
 
-void openPsinfo(int pid)
+top_data openPsinfo(int pid)
 {
 	int fd;
 	char fileName[1024]; //proc/PID/각종 정보파일
 	char buffer[512];
 	psinfo_t data;
+	top_data t_data;
 
-	int lwp=0; //데이터를 꺼내 저장할 면수들
+	int lwp=0; //데이터를 꺼내 저장할 변수들
 	char *command;
 	int size, res;
 	char *dmodel;
@@ -64,7 +78,7 @@ void openPsinfo(int pid)
 	read(fd, &data, sizeof(psinfo_t));
 
 	lwp = data.pr_nlwp;
-	command=data.pr_fname;
+	command = data.pr_fname;
 	size = data.pr_size;
 	res = data.pr_rssize;
 
@@ -72,8 +86,14 @@ void openPsinfo(int pid)
 	hour = time.tv_sec / 60;
 	min = time.tv_sec % 60;
 
-	printf("LWP : %d COMMAND : %s ", lwp, command);
-	printf("SIZE : %d RES : %d ", size, res);
-	printf("time : %d:%d \n", hour, min);
+	t_data.pid = pid;
+	t_data.lwp = (int)lwp;
+	t_data.size = (int)size;
+	t_data.res = (int)res;
+	t_data.t_hour = (int)hour;
+	t_data.t_min = (int)min;
+	strcpy(t_data.command, command);
 	close(fd);
+
+	return t_data;
 }
