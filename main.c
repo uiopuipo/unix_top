@@ -1,16 +1,8 @@
 #include "stdhdr.h"
 
-struct top openPsinfo(int pid);
 
-typedef struct top{
-	int pid;
-	int lwp;
-	char command[64];
-	char time[8];
-	int size;
-	int res;
-}top_data;
 
+struct top OpenPsinfo(int pid);
 static processCount=0;
 int main(void) {
 	int pid;
@@ -28,7 +20,7 @@ int main(void) {
 	while((dent=readdir(dp)))
 	{
 		pid = atoi(dent->d_name);
-		data[pid] = openPsinfo(pid);
+		data[pid] = OpenPsinfo(pid);
 		printf("PID:%d ", data[pid].pid);
 		printf("LWP:%d COMMAND:%s ", data[pid].lwp, data[pid].command);
 		printf("SIZE:%d RES:%d ", data[pid].size, data[pid].res);
@@ -44,13 +36,13 @@ int main(void) {
 	return 0;
 }
 
-top_data openPsinfo(int pid)
+topData OpenPsinfo(int pid)
 {
 	int fd;
 	char fileName[1024]; //proc/PID/각종 정보파일
 	char buffer[512];
 	psinfo_t data;
-	top_data t_data;
+	topData t_data;
 
 	int lwp=0; //데이터를 꺼내 저장할 변수들
 	char *command;

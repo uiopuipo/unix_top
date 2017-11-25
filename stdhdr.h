@@ -11,6 +11,7 @@
 #include <sys/syscall.h>
 #include <sys/uio.h>
 
+
 //화면에 보여줄 top 구조체 요소.
 typedef struct top{
 	int pid;
