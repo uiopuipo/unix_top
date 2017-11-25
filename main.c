@@ -47,9 +47,13 @@ void openPsinfo(int pid)
 	char fileName[1024]; //proc/PID/각종 정보파일
 	char buffer[512];
 	psinfo_t data;
-	int lwp=0;
+
+	int lwp=0; //데이터를 꺼내 저장할 면수들
 	char *command;
 	int size, res;
+	char *dmodel;
+	timestruc_t time;
+	int hour, min;
 
 	memset(&data, 0, sizeof(psinfo_t));
 	sprintf(fileName, "/proc/%d/psinfo", pid);
@@ -64,7 +68,12 @@ void openPsinfo(int pid)
 	size = data.pr_size;
 	res = data.pr_rssize;
 
+	time = data.pr_time;
+	hour = time.tv_sec / 60;
+	min = time.tv_sec % 60;
+
 	printf("LWP : %d COMMAND : %s ", lwp, command);
-	printf("SIZE : %d RES : %d\n", size, res);
+	printf("SIZE : %d RES : %d ", size, res);
+	printf("time : %d:%d \n", hour, min);
 	close(fd);
 }
