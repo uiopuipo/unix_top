@@ -23,7 +23,7 @@ int main(void) {
 
 	while((dent=readdir(dp)))
 	{
-		printf("프로세스 PID : %d\n", atoi(dent->d_name));
+		printf("PID : %d ", atoi(dent->d_name));
 		openPsinfo(atoi(dent->d_name));
 	}
 
@@ -42,6 +42,7 @@ void openPsinfo(int pid)
 	char buffer[512];
 	psinfo_t data;
 	int lwp=0;
+	char *command;
 
 	memset(&data, 0, sizeof(psinfo_t));
 	sprintf(fileName, "/proc/%d/psinfo", pid);
@@ -52,6 +53,8 @@ void openPsinfo(int pid)
 	read(fd, &data, sizeof(psinfo_t));
 
 	lwp = data.pr_nlwp;
-	printf("프로세스의 활성 LWP 수 : %d\n", lwp);
+	command=data.pr_fname;
+
+	printf("LWP : %d COMMAND : %s\n", lwp, command);
 	close(fd);
 }
