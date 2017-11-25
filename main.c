@@ -9,6 +9,7 @@
 #include <sys/types.h>
 
 void openPsinfo(int pid);
+static processCount=0;
 
 int main(void) {
 	DIR *dp;
@@ -26,6 +27,7 @@ int main(void) {
 		printf("프로세스 PID : %d\n", atoi(dent->d_name));
 		openPsinfo(atoi(dent->d_name));
 	}
+	printf("프로세스의 개수 : %d\n", processCount);
 
     if(closedir(dp) < 0) {
 		printf("ERROR: Could not close directory(%s).\n", dirName);
@@ -43,8 +45,11 @@ void openPsinfo(int pid)
 	psinfo_t data;
 	int lwp=0;
 
+	processCount++;
+
 	memset(&data, 0, sizeof(psinfo_t));
 	sprintf(fileName, "/proc/%d/psinfo", pid);
+	
 	if((fd = open(fileName, O_RDONLY)) < 0) 
 	{
 		printf("ERROR: %s open failed\n", fileName);
