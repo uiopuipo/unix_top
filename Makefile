@@ -1,18 +1,19 @@
 # Makefile
 
-# 파일명을 입력 (확장자 빼고)
-FILE1=main
-
-OBJS=$(FILE1)
-
 CC=gcc
 CFLAGS=
+OBJS=main.o option.o
 LIBS=
+all:	add
 
-all: $(FILE1)
+add:	$(OBJS)
+	$(CC) $(CFLAGS) -o myTop $(OBJS) $(LIBS)
+	
+main.o:	main.c
+	$(CC) $(CFLAGS) -c main.c -l stdhdr.h
+option.o: option.c
+	$(CC) $(CFLAGS) -c option.c -l stdhdr.h
 
-$(FILE1):	$(FILE1).c
-	$(CC) $(FILE1).c -o mytop
+clean:
+	rm -f $(OBJS) add core
 
-c:
-	rm -f $(OBJS) output core

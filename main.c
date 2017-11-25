@@ -1,17 +1,11 @@
-#include <dirent.h> 
-#include <errno.h> 
-#include <fcntl.h>
-#include <stdio.h> 
-#include <stdlib.h> 
-#include <string.h> 
-#include <procfs.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include "stdhdr.h"
 
 void openPsinfo(int pid);
-static processCount=0;
+void openStatus(int pid);
 
+static processCount=0;
 int main(void) {
+	int pid;
 	DIR *dp;
 	struct dirent *dent;
     char dirName[] = "/proc";
@@ -24,8 +18,9 @@ int main(void) {
 
 	while((dent=readdir(dp)))
 	{
-		printf("프로세스 PID : %d\n", atoi(dent->d_name));
-		openPsinfo(atoi(dent->d_name));
+		pid = atoi(dent->d_name);
+		printf("PID : %d ", pid);
+		openPsinfo(pid);
 	}
 	printf("프로세스의 개수 : %d\n", processCount);
 
@@ -43,7 +38,13 @@ void openPsinfo(int pid)
 	char fileName[1024]; //proc/PID/각종 정보파일
 	char buffer[512];
 	psinfo_t data;
-	int lwp=0;
+
+	int lwp=0; //데이터를 꺼내 저장할 면수들
+	char *command;
+	int size, res;
+	char *dmodel;
+	timestruc_t time;
+	int hour, min;
 
 	processCount++;
 
@@ -57,6 +58,16 @@ void openPsinfo(int pid)
 	read(fd, &data, sizeof(psinfo_t));
 
 	lwp = data.pr_nlwp;
-	printf("프로세스의 활성 LWP 수 : %d\n", lwp);
+	command=data.pr_fname;
+	size = data.pr_size;
+	res = data.pr_rssize;
+
+	time = data.pr_time;
+	hour = time.tv_sec / 60;
+	min = time.tv_sec % 60;
+
+	printf("LWP : %d COMMAND : %s ", lwp, command);
+	printf("SIZE : %d RES : %d ", size, res);
+	printf("time : %d:%d \n", hour, min);
 	close(fd);
 }
