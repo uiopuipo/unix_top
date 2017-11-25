@@ -4,20 +4,64 @@
 
 struct top OpenPsinfo(int pid);
 static processCount=0;
+void PrintPsInfo(DIR **dp, topData *data);
 int main(void) {
 	int pid;
 	struct top data[65535];
 	DIR *dp;
-	struct dirent *dent;
     char dirName[] = "/proc";
 
-	dp = opendir(dirName);
+	char optionChoice;
+	dp = opendir(dirName); // /proc 디렉토리를 열어 
     if(dp == NULL) {
 		printf("ERROR: Could not open directory(%s).\n", dirName);
 		exit(1);
 	}
 
-	while((dent=readdir(dp)))
+	system("clear");
+	while(1){
+
+		printf("Top Program \n");
+		
+		PrintPsInfo(dp, data);
+		printf("프로세스의 개수 : %d\n", processCount);
+
+		optionChoice = getc(stdin); //option 입력 시 optionChoice에 값을 넣음
+
+
+		//옵션처리
+		switch(optionChoice) {
+			case 'k': //프로세스 종료 옵션
+				break;
+			case 's': //정렬 옵션
+				break;
+			case 'q': //q를 누르면 프로그램 종료
+				system("clear");
+				 if(closedir(dp) < 0) {
+					printf("ERROR: Could not close directory(%s).\n", dirName);
+					exit(2);
+				}
+				exit(1);
+				break;
+			default :
+				break;
+		}
+		
+		
+	}
+
+    if(closedir(dp) < 0) {
+		printf("ERROR: Could not close directory(%s).\n", dirName);
+		exit(2);
+	}
+
+	return 0;
+}
+void PrintPsInfo(DIR **dp,topData *data){
+	int pid;
+	struct dirent *dent;
+	printf("ss");
+	while((dent=readdir(dp))) //디렉토리 정보를 읽어 dent가 가리키게 한다.
 	{
 		pid = atoi(dent->d_name);
 		data[pid] = OpenPsinfo(pid);
@@ -26,14 +70,6 @@ int main(void) {
 		printf("SIZE:%d RES:%d ", data[pid].size, data[pid].res);
 		printf("time: %s\n", data[pid].time);
 	}
-	printf("프로세스의 개수 : %d\n", processCount);
-
-    if(closedir(dp) < 0) {
-		printf("ERROR: Could not close directory(%s).\n", dirName);
-		exit(2);
-	}
-
-	return 0;
 }
 
 topData OpenPsinfo(int pid)
