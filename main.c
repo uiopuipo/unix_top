@@ -7,7 +7,7 @@ static processCount=0;
 void PrintPsInfo(DIR *dp, topData *data);
 int main(void) {
 	int pid;
-	struct top data[65535];
+	topData data[65535];
 	DIR *dp;
     char dirName[] = "/proc";
 
@@ -34,6 +34,29 @@ int main(void) {
 			case 'k': //프로세스 종료 옵션
 				break;
 			case 's': //정렬 옵션
+				{
+					char choice;
+					int size = sizeof(data)/sizeof(topData);
+					printf("sorting (size:'s', pid:'p', res:'r') : ");
+					choice = fgetc(stdin);
+					switch(choice) {
+						case 's':
+							if(OptSort(data, size, SORT_SIZE) < 0)
+								printf("sort part error\n");
+							break;
+						case 'p':
+							if(OptSort(data, size, SORT_PID) < 0)
+								printf("sort part error\n");
+							break;
+						case 'r':
+							if(OptSort(data, size, SORT_RES) < 0)
+								printf("sort part error\n");
+							break;
+						default:
+							break;
+					}
+
+				}
 				break;
 			case 'q': //q를 누르면 프로그램 종료
 				system("clear");

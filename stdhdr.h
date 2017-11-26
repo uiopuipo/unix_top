@@ -36,7 +36,7 @@ typedef struct top{
 //option fucntion
 void OptKill();
 
-int OptSort(topData *data, int flag);
+int OptSort(topData *data,int size, int flag);
 
 
 struct top OpenPsinfo(int);
