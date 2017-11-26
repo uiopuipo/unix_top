@@ -21,3 +21,9 @@ typedef struct top{
 	int size;
 	int res;
 } topData;
+
+//링크리스트 노드
+typedef struct node {
+	topData element;
+	struct topNode *link;
+} topNode;
