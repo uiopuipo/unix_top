@@ -1,7 +1,7 @@
 #include "stdhdr.h"
 
 //현재 실행되고있는 파일 구조체를 가져온다.
-short  optKill( ){
+int OptKill( ){
 	int targetPID;
 	short flag;
 
