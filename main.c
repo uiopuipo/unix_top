@@ -4,7 +4,7 @@
 
 struct top OpenPsinfo(int pid);
 static processCount=0;
-void PrintPsInfo(DIR **dp, topData *data);
+void PrintPsInfo(DIR *dp, topData *data);
 int main(void) {
 	int pid;
 	struct top data[65535];
@@ -46,8 +46,6 @@ int main(void) {
 			default :
 				break;
 		}
-		
-		
 	}
 
     if(closedir(dp) < 0) {
@@ -57,7 +55,7 @@ int main(void) {
 
 	return 0;
 }
-void PrintPsInfo(DIR **dp,topData *data){
+void PrintPsInfo(DIR *dp,topData *data){
 	int pid;
 	struct dirent *dent;
 	printf("ss");
