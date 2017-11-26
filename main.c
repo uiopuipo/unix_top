@@ -4,12 +4,14 @@
 
 struct top OpenPsinfo(int pid);
 static processCount=0;
+
 void PrintPsInfo(DIR *dp, topData *data);
 int main(void) {
 	int pid;
 	struct top data[MAX_PID];
 	DIR *dp;
     char dirName[] = "/proc";
+	char str[20];
 
 	char optionChoice;
 	dp = opendir(dirName); // /proc 디렉토리를 열어 
@@ -35,6 +37,10 @@ int main(void) {
 				OptKill();
 				break;
 			case 's': //정렬 옵션
+				break;
+			case 'f': //검색 옵션
+				scanf("%s", str);
+				SearchData(str, data);
 				break;
 			case 'q': //q를 누르면 프로그램 종료
 				system("clear");
@@ -69,6 +75,27 @@ void PrintPsInfo(DIR *dp, topData *data){
 		printf("LWP:%d COMMAND:%s ", data[pid].lwp, data[pid].command);
 		printf("SIZE:%d RES:%d ", data[pid].size, data[pid].res);
 		printf("time: %s\n", data[pid].time);
+	}
+}
+
+void SearchData(char *str, topData *data)
+{
+	int i, value = 0;
+	char cmp[20] = "pid";
+	if( !strcmp(str, cmp) )
+	{
+		scanf("%d", &value);
+		while(i < MAX_PID)
+		{
+			if(data[i].pid == value)
+			{
+				printf("PID:%d ", data[i].pid);
+				printf("LWP:%d COMMAND:%s ", data[i].lwp, data[i].command);
+				printf("SIZE:%d RES:%d ", data[i].size, data[i].res);
+				printf("time: %s\n", data[i].time);
+			}
+			i++;
+		}
 	}
 }
 
