@@ -7,7 +7,7 @@ static processCount=0;
 void PrintPsInfo(DIR *dp, topData *data);
 int main(void) {
 	int pid;
-	struct top data[65535];
+	struct top data[MAX_PID];
 	DIR *dp;
     char dirName[] = "/proc";
 
@@ -32,6 +32,7 @@ int main(void) {
 		//可记贸府
 		switch(optionChoice) {
 			case 'k': //橇肺技胶 辆丰 可记
+				OptKill();
 				break;
 			case 's': //沥纺 可记
 				break;
@@ -55,7 +56,8 @@ int main(void) {
 
 	return 0;
 }
-void PrintPsInfo(DIR *dp,topData *data){
+
+void PrintPsInfo(DIR *dp, topData *data){
 	int pid;
 	struct dirent *dent;
 	printf("ss");

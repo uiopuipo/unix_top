@@ -17,7 +17,7 @@
 #define SORT_PID 2
 #define SORT_RES 3
 
-
+#define MAX_PID 65535
 //화면에 보여줄 top 구조체 요소.
 typedef struct top{
 	int pid;
