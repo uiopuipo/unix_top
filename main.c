@@ -56,8 +56,12 @@ int main(void) {
 
 	return 0;
 }
+<<<<<<< Updated upstream
 
 void PrintPsInfo(DIR *dp, topData *data){
+=======
+void PrintPsInfo(DIR **dp){
+>>>>>>> Stashed changes
 	int pid;
 	struct dirent *dent;
 	printf("ss");
