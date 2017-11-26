@@ -10,6 +10,12 @@
 #include <sys/param.h>
 #include <sys/syscall.h>
 #include <sys/uio.h>
+#include <signal.h>
+
+//OptSort()함수의 signal
+#define SORT_SIZE 1
+#define SORT_PID 2
+#define SORT_RES 3
 
 
 //화면에 보여줄 top 구조체 요소.
@@ -22,8 +28,17 @@ typedef struct top{
 	int res;
 } topData;
 
-//링크리스트 노드
-typedef struct node {
-	topData element;
-	struct topNode *link;
-} topNode;
+///////define
+
+
+///////funciton
+
+//option fucntion
+void OptKill();
+
+int OptSort(topData *data, int flag);
+
+
+struct top OpenPsinfo(int);
+void PrintPsInfo(DIR *dp, topData *data);
+
