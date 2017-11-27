@@ -15,12 +15,21 @@
 #include <sys/uio.h>
 #include <signal.h>
 
+//define
 //OptSort()함수의 signal
 #define SORT_SIZE 1
 #define SORT_PID 2
 #define SORT_RES 3
 
-#define MAX_PID 65535
+//PrintPsInfo()함수의 signal
+#define FRONT_PAGE 1
+#define BACK_PAGE 2
+#define INIT_PAGE 3 //업데이트 할 시 초기화 시그널
+#define CURRENT_PAGE 4
+
+//받아올 프로세스 한정치
+#define MAX_DATA_SIZE 400
+
 //화면에 보여줄 top 구조체 요소.
 typedef struct top{
 	int pid;
@@ -32,18 +41,26 @@ typedef struct top{
 	int mem;
 } topData;
 
-///////define
+//data에 가져온 프로세스 개수.
+static int processCount=0;
 
-
-///////funciton
+//funciton
 void PrintData(int pid, topData *data);
 void SearchData(char *str, topData *data);
+struct top OpenPsinfo(int);
+void PrintPsInfo(topData *data, int signal);
+void PrintMainInfo();
+void GetPsInfo(topData *data);
+void ChangePos(topData *a, topData *b); 
+void ClearReadBuffer();
+void InitData(topData *data);
+void GetDataSize(topData *data);
+int Getch(void);  
+struct top OpenPsinfo(int pid);
+void PrintHelpInfo();
+
 //option fucntion
 void OptKill();
+int OptSort(topData *data,int size, int flag);
 
-int OptSort(topData *data, int flag);
-
-
-struct top OpenPsinfo(int);
-void PrintPsInfo(DIR *dp, topData *data);
 
