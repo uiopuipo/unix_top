@@ -39,7 +39,7 @@ int main(void) {
 			case 's': //정렬 옵션
 				break;
 			case 'f': //검색 옵션
-				printf("검색할 항목: ");
+				printf("검색할 항목을 입력하세요(pid, command) : ");
 				scanf("%s", str);
 				SearchData(str, data);
 				break;
