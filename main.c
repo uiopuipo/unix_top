@@ -1,35 +1,26 @@
 #include "stdhdr.h"
 
-
-
-struct top OpenPsinfo(int pid);
-static processCount=0;
-
-void PrintPsInfo(DIR *dp, topData *data);
 int main(void) {
 	int pid;
 	struct top data[MAX_PID];
+	char str[20];
+	char optionChoice;
+
 	DIR *dp;
     char dirName[] = "/proc";
-	char str[20];
 
-	char optionChoice;
-	dp = opendir(dirName); // /proc 디렉토리를 열어 
+	dp = opendir(dirName); // proc 디렉토리를 연다.
     if(dp == NULL) {
 		printf("ERROR: Could not open directory(%s).\n", dirName);
 		exit(1);
 	}
 
 	system("clear");
+
 	while(1){
-
 		printf("Top Program \n");
-		
 		PrintPsInfo(dp, data);
-		printf("프로세스의 개수 : %d\n", processCount);
-
 		optionChoice = getc(stdin); //option 입력 시 optionChoice에 값을 넣음
-
 
 		//옵션처리
 		switch(optionChoice) {
@@ -50,6 +41,9 @@ int main(void) {
 					exit(2);
 				}
 				exit(1);
+				break;
+			case 'r': //r키 누르면 새로고침
+				PrintPsInfo(dp, data);
 				break;
 			default :
 				break;
@@ -76,13 +70,17 @@ void PrintPsInfo(DIR *dp, topData *data)
 {
 	int pid;
 	struct dirent *dent;
-	printf("ss");
+
+	processCount = 0;
+
 	while((dent=readdir(dp))) //디렉토리 정보를 읽어 dent가 가리키게 한다.
 	{
 		pid = atoi(dent->d_name);
 		data[pid] = OpenPsinfo(pid);
 		PrintData(pid, data);
 	}
+	printf("프로세스의 개수 : %d\n", processCount);
+	rewinddir(dp);
 }
 
 void SearchData(char *str, topData *data)

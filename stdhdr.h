@@ -33,14 +33,14 @@ typedef struct top{
 
 
 ///////funciton
+struct top OpenPsinfo(int);
 void PrintData(int pid, topData *data);
 void SearchData(char *str, topData *data);
+void PrintPsInfo(DIR *dp, topData *data);
 //option fucntion
 void OptKill();
 
 int OptSort(topData *data, int flag);
 
-
-struct top OpenPsinfo(int);
-void PrintPsInfo(DIR *dp, topData *data);
+static processCount=0;
 
