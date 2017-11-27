@@ -33,6 +33,7 @@ typedef struct top{
 
 
 ///////funciton
+void PrintData(int pid, topData *data);
 void SearchData(char *str, topData *data);
 //option fucntion
 void OptKill();

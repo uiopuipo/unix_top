@@ -39,6 +39,7 @@ int main(void) {
 			case 's': //정렬 옵션
 				break;
 			case 'f': //검색 옵션
+				printf("검색할 항목: ");
 				scanf("%s", str);
 				SearchData(str, data);
 				break;
@@ -63,7 +64,16 @@ int main(void) {
 	return 0;
 }
 
-void PrintPsInfo(DIR *dp, topData *data){
+void PrintData(int pid, topData *data)
+{
+	printf("PID:%d ", data[pid].pid);
+	printf("LWP:%d COMMAND:%s ", data[pid].lwp, data[pid].command);
+	printf("SIZE:%d RES:%d ", data[pid].size, data[pid].res);
+	printf("time: %s\n", data[pid].time);
+}
+
+void PrintPsInfo(DIR *dp, topData *data)
+{
 	int pid;
 	struct dirent *dent;
 	printf("ss");
@@ -71,31 +81,47 @@ void PrintPsInfo(DIR *dp, topData *data){
 	{
 		pid = atoi(dent->d_name);
 		data[pid] = OpenPsinfo(pid);
-		printf("PID:%d ", data[pid].pid);
-		printf("LWP:%d COMMAND:%s ", data[pid].lwp, data[pid].command);
-		printf("SIZE:%d RES:%d ", data[pid].size, data[pid].res);
-		printf("time: %s\n", data[pid].time);
+		PrintData(pid, data);
 	}
 }
 
 void SearchData(char *str, topData *data)
 {
-	int i, value = 0;
-	char cmp[20] = "pid";
-	if( !strcmp(str, cmp) )
+	int i = 0;
+	int tf = -1;
+	char cmp[2][20] = {"pid", "command"};
+	int value;
+	char strValue[20];
+
+	if( !strcmp(str, cmp[0]) )
+		tf = 0;
+	if( !strcmp(str, cmp[1]) )
+		tf = 1;
+
+	switch(tf){
+		case 0:
+			printf("검색할 PID를 입력하세요 : ");
+			scanf("%d", &value);
+			break;
+		case 1:
+			printf("검색할 COMMAND를 입력하세요 : ");
+			scanf("%s", strValue);
+			break;
+	}
+
+	while(i < MAX_PID)
 	{
-		scanf("%d", &value);
-		while(i < MAX_PID)
-		{
-			if(data[i].pid == value)
-			{
-				printf("PID:%d ", data[i].pid);
-				printf("LWP:%d COMMAND:%s ", data[i].lwp, data[i].command);
-				printf("SIZE:%d RES:%d ", data[i].size, data[i].res);
-				printf("time: %s\n", data[i].time);
-			}
-			i++;
+		switch(tf){
+			case 0:
+				if(data[i].pid == value)
+					PrintData(data[i].pid, data);
+				break;
+			case 1:
+				if( !strcmp(data[i].command, strValue) )
+					PrintData(data[i].pid, data);
+				break;
 		}
+		i++;
 	}
 }
 
