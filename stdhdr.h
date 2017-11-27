@@ -1,4 +1,5 @@
 #include <dirent.h> 
+#include <unistd.h>
 #include <errno.h> 
 #include <fcntl.h>
 #include <stdio.h> 
@@ -6,6 +7,7 @@
 #include <string.h> 
 #include <signal.h>
 #include <procfs.h>
+#include <termios.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/param.h>
@@ -27,20 +29,21 @@ typedef struct top{
 	char time[8];
 	int size;
 	int res;
+	int mem;
 } topData;
 
 ///////define
 
 
 ///////funciton
-struct top OpenPsinfo(int);
 void PrintData(int pid, topData *data);
 void SearchData(char *str, topData *data);
-void PrintPsInfo(DIR *dp, topData *data);
 //option fucntion
 void OptKill();
 
 int OptSort(topData *data, int flag);
 
-static processCount=0;
+
+struct top OpenPsinfo(int);
+void PrintPsInfo(DIR *dp, topData *data);
 
