@@ -22,7 +22,7 @@ void OptKill(){
 //정렬하고싶은 배열, 배열의 개수, FLAG값을 인자로 받는다.
 int OptSort(topData *data, int size, int flag){
 	int i, j;
-	int key; //비교할 값
+	topData key;
 
 
 	if(size <= 0) {
@@ -35,31 +35,30 @@ int OptSort(topData *data, int size, int flag){
 
 	switch(flag) {
 		case SORT_SIZE:
-			printf("sorting size\n"); 
-			
 			for(i=1; i< size; i++){
-				key = data[i].size;
-				for(j=i-1; j>=0 && key > data[j].size ; j--){
-					ChangePos(&data[j+1],&data[j]);
+				key = data[i];
+				for(j=i-1; j>=0 && key.size > data[j].size ; j--){
+					data[j+1] = data[j];
 				}
+				data[j+1] = key;
 			}
 			break;
 		case SORT_PID:
-			printf("sorting pid\n"); 
 			for(i=1; i< size; i++){
-				key = data[i].pid;
-				for(j=i-1; j>=0 && key > data[j].pid; j--){
-					ChangePos(&data[j+1],&data[j]);
+				key = data[i];
+				for(j=i-1; j>=0 && key.pid > data[j].pid; j--){
+					data[j+1] = data[j];
 				}
+				data[j+1] = key;
 			}
 			break;
 		case SORT_RES:
-			printf("sorting res\n"); 
 			for(i=1; i< size; i++){
-				key = data[i].res;
-				for(j=i-1; j>=0 && key > data[j].res ; j--){
-					ChangePos(&data[j+1],&data[j]);
+				key = data[i];
+				for(j=i-1; j>=0 && key.res > data[j].res ; j--){
+					data[j+1] = data[j];
 				}
+				data[j+1] = key;
 			}
 			break;
 		default :
@@ -74,31 +73,6 @@ int OptSort(topData *data, int size, int flag){
 /////////////////
 //Function Part//
 /////////////////
-
-void ChangePos(topData *a, topData *b) {
-	topData temp;
-
-	temp.pid = a->pid;
-	temp.lwp = a->lwp;
-	strcpy(temp.command, a->command);
-	strcpy(temp.time, a->time);
-	temp.size = a->size;
-	temp.res = a->res;
-
-	a->pid = b->pid;
-	a->lwp = b->lwp;
-	strcpy(a->command, b->command);
-	strcpy(a->time, b->time);
-	a->size = b->size;
-	a->res = b->res;
-
-	b->pid = temp.pid;
-	b->lwp = temp.lwp;
-	strcpy(b->command, temp.command);
-	strcpy(b->time, temp.time);
-	b->size = temp.size;
-	b->res = temp.res;
-}
 
 //버퍼를 비우기 위한 함수.
 void ClearReadBuffer(){
@@ -115,8 +89,8 @@ void InitData(topData *data) {
 	}
 }
 
-//프로세스 개수를 구함. 전역변수 processCount에 넣게끔 만듬 (나중에 바꿀수도 있음)
-void GetDataSize(topData *data){
+//프로세스 개수를 구함
+int GetDataSize(topData *data){
 	int i;
 	int count=0;
 
@@ -125,26 +99,20 @@ void GetDataSize(topData *data){
 			break;
 		count++;
 	}
-
-	processCount = count; //가져온 프로세스 개수
+	return count;
 }
 
 //하나의 프로세스값 출력
 void PrintProcess(topData data){
-	printf("PID:%d ", data.pid);
-	printf("LWP:%d COMMAND:%s ", data.lwp, data.command);
-	printf("SIZE:%d RES:%d ", data.size, data.res);
-	printf("TIME: %s ", data.time);
-	printf("COMMAND: %s \n", data.command);
+	printf(" PID:%-6d  LWP:%-4d  SIZE:%-6d  RES:%-6d  TIME:%-6s  MEM:%-4d  COMMAND:%-10s\n " ,data.pid, data.lwp, data.size, data.res, data.time, data.mem, data.command);
+//	printf("PID:%d ", data.pid);
+//	printf("LWP:%d COMMAND:%s ", data.lwp, data.command);
+//	printf("SIZE:%d RES:%d ", data.size, data.res);
+//	printf("TIME: %s ", data.time);
+//	printf("COMMAND: %s \n", data.command);
 }
 
 
-
-void PrintData(int pid, topData *data)
-{
-	printf("%-4d | PID : %-7d| LWP %-4d| SIZE : %-7d| RES : %-7d| TIME : %-7s| MEM : %4d| COMMAND : %-10s\n ", processCount ,data[pid].pid, data[pid].lwp, data[pid].size, data[pid].res, data[pid].time, data[pid].mem, data[pid].command);
-	printf("---------------------------------------------------------------------------------------------------------------\n");
-}
 void GetPsInfo(topData *data){
 	DIR *dp;
 	int pid;
@@ -165,11 +133,6 @@ void GetPsInfo(topData *data){
 	}
 	data[count].pid = -1; //뒷부분에는 pid값을 -1로 해줌. Update할 시 이전에 받아온데이터를 걸러내기 위해서.
 
-	if(count == 0) {
-		printf("프로세스의 개수가 %d개 입니다.\n",count);
-	} else {
-		processCount = count; //프로세스 개수 설정
-	}
 
     if(closedir(dp) < 0) {
 		printf("ERROR: Could not close directory(%s).\n", dirName);
@@ -179,10 +142,12 @@ void GetPsInfo(topData *data){
 
 //top프로그램 화면 위에 보여주는부분 출력
 void PrintMainInfo(){
-	printf("------------------------\n");
-	printf("This is a Top program \n");
-	printf("Help press 'h'\n");
-	printf("------------------------\n");
+	printf("----------------------------------------------------------------------------------\n");
+	printf("                                      Top program            \n");
+	printf("                                     Help press 'h'          \n");
+	printf("----------------------------------------------------------------------------------\n");
+	
+	printf("    PID         LWP       SIZE         RES         TIME         MEM       COMMAND\n ");
 }
 
 //프로세스 정보 출력.
@@ -190,7 +155,8 @@ void PrintPsInfo(topData *data, int signal) {
 	static int currentIndex=0;
 	static int page = 1;
 	int i;
-
+	int processCount = GetDataSize(data);
+	
 	// 업데이트시 초기화
 	if(signal == INIT_PAGE){
 		currentIndex =0;
@@ -198,20 +164,20 @@ void PrintPsInfo(topData *data, int signal) {
 		signal = CURRENT_PAGE;
 	}
 	if(signal == CURRENT_PAGE){
-		for(i=currentIndex; i<page*15;i++){
+		for(i=currentIndex; i<page*MAX_SHOW_PROCESS;i++){
 			PrintProcess(data[i]);
 		}
 	}
 
 	if(signal == FRONT_PAGE){//앞페이지를 누를 때 
-		if(currentIndex + 15 > processCount) { // 맨 뒷부분이면
+		if(currentIndex + MAX_SHOW_PROCESS > processCount) { // 맨 뒷부분이면
 			for(i=currentIndex;i<processCount;i++){ //그냥 현위치에서
 				PrintProcess(data[i]);
 			}
 		} else {//맨 뒷부분이 아니면
-			currentIndex += 15;
+			currentIndex += MAX_SHOW_PROCESS;
 			page++; //출력 후 넘어가
-			for(i=currentIndex; i < page * 15; i++){
+			for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++){
 				if(i< processCount){
 					PrintProcess(data[i]);
 
@@ -219,15 +185,14 @@ void PrintPsInfo(topData *data, int signal) {
 			} 
 		}
 	}
-
 	if(signal ==BACK_PAGE){//뒷페이지를 눌렀을 시
-		if(currentIndex < 15) {//첫페이지면 그냥 출력.
-			for(i=currentIndex; i < page * 15; i++)
+		if(currentIndex < MAX_SHOW_PROCESS) {//첫페이지면 그냥 출력.
+			for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++)
 					PrintProcess(data[i]);
 		} else {
-			currentIndex -= 15;
+			currentIndex -= MAX_SHOW_PROCESS;
 			page--;
-			for(i=currentIndex; i < page*15; i++){
+			for(i=currentIndex; i < page*MAX_SHOW_PROCESS; i++){
 					PrintProcess(data[i]);
 			}
 		}
@@ -287,21 +252,6 @@ topData OpenPsinfo(int pid)
 	return t_data;
 }
 
-int Getch(void){
-	int ch;
-	struct termios buf, save;
-	tcgetattr(0,&save);
-	buf = save;
-	buf.c_lflag &= ~(ICANON|ECHO);
-	buf.c_cc[VMIN]=1;
-	buf.c_cc[VTIME]=0;
-	tcsetattr(0, TCSAFLUSH, &buf);
-	ch=getchar();
-	tcsetattr(0, TCSAFLUSH, &save);
-	ClearReadBuffer();
-	return ch;
-}
-
 void SearchData(char *str, topData *data)
 {
 	int i = 0;
@@ -310,6 +260,8 @@ void SearchData(char *str, topData *data)
 	int value;
 	char strValue[20];
 	int flag;
+	int processCount = GetDataSize(data);
+	
 
 	if( !strcmp(str, cmp[0]) )
 		tf = 0;

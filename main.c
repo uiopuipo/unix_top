@@ -3,8 +3,6 @@
 
 
 int main(void) {
-	int pid,men;
-	char str[20];
 	topData data[MAX_DATA_SIZE];
 	char optionChoice;
 
@@ -13,79 +11,67 @@ int main(void) {
 	InitData(data);
 	PrintMainInfo();
 	GetPsInfo(data); //process정보를 data에 얻어온다.
-	PrintProcess(data);
+	PrintPsInfo(data, CURRENT_PAGE);
 	while(1){
 
 		optionChoice = fgetc(stdin); //option 입력 시 optionChoice에 값을 넣음
 		ClearReadBuffer();
 
-		
+		system("clear");
+		PrintMainInfo();
 		//옵션처리
 		switch(optionChoice) {
 			case 'k': //프로세스 종료 옵션
-				system("clear");
-				PrintMainInfo();
+				PrintPsInfo(data, CURRENT_PAGE);
 				OptKill();
 				break;
 			case 's': //정렬 옵션
-				system("clear");
-				PrintMainInfo();
 				{
+					PrintPsInfo(data, CURRENT_PAGE);
 					char choice;
-					int size = processCount; //나중에 static없앨 수도 있어서 size 변수 선언
-					printf("size : :%d\n", size);
+					int processCount = GetDataSize(data);
 					printf("sorting (size:'s', pid:'p', res:'r') : ");
 					choice = getc(stdin);
 					ClearReadBuffer();
 					switch(choice) {
 						case 's':
-							printf("you choose s\n");
-							if(OptSort(data, size, SORT_SIZE) < 0)
+							if(OptSort(data, processCount, SORT_SIZE) < 0)
 								printf("sort part error\n");
 							break;
 						case 'p':
-							printf("you choose p\n");
-							if(OptSort(data, size, SORT_PID) < 0)
+							if(OptSort(data, processCount, SORT_PID) < 0)
 								printf("sort part error\n");
 							break;
 						case 'r':
-							printf("you choose r\n");
-							if(OptSort(data, size, SORT_RES) < 0)
+							if(OptSort(data, processCount, SORT_RES) < 0)
 								printf("sort part error\n");
 							break;
 						default:
 							break;
 					}
-
 				}
+				PrintPsInfo(data, CURRENT_PAGE);
 				break;
 			case 'f': //검색 옵션
-				system("clear");
-				PrintMainInfo();
 				PrintPsInfo(data, CURRENT_PAGE);
-				printf("검색할 항목을 입력하세요(pid, command) : ");
-				scanf("%s", str);
-				SearchData(str, data);
+				{
+					char str[20];
+					printf("검색할 항목을 입력하세요(pid, command) : ");
+					scanf("%s", str);
+					SearchData(str, data);
+				}
 				break;
 			case 'r': // 업데이트
-				system("clear");
-				PrintMainInfo();
 				GetPsInfo(data);
 				PrintPsInfo(data, INIT_PAGE);
 				break;
 			case 'n': //화면 넘기
-				system("clear");
-				PrintMainInfo();
 				PrintPsInfo(data, FRONT_PAGE);
 				break;
 			case 'b': //이전 화면으로 넘기기
-				system("clear");
-				PrintMainInfo();
 				PrintPsInfo(data, BACK_PAGE);
 				break;
 			case 'h':
-				system("clear");
-				PrintMainInfo();
 				PrintHelpInfo();
 				break;
 			case 'q': //q를 누르면 프로그램 종료
@@ -95,8 +81,8 @@ int main(void) {
 			default :
 				break;
 		}
-//		PrintPsInfo(data, CURRENT_PAGE);
-//		GetPsInfo(data); //process정보를 data에 얻어온다. 여기다 이걸 넣어버리면, 업데이트 기능이 필요가없다.. 일단 주석처리
+	//	PrintPsInfo(data, CURRENT_PAGE);
+	//	GetPsInfo(data); //process정보를 data에 얻어온다. 여기다 이걸 넣어버리면, 업데이트 기능이 필요가없다.. 일단 주석처리
 	}
 
 
