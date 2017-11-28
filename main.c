@@ -62,6 +62,7 @@ int main(void) {
 			case 'f': //검색 옵션
 				system("clear");
 				PrintMainInfo();
+				PrintPsInfo(data, CURRENT_PAGE);
 				printf("검색할 항목을 입력하세요(pid, command) : ");
 				scanf("%s", str);
 				SearchData(str, data);
@@ -95,6 +96,7 @@ int main(void) {
 				break;
 		}
 //		PrintPsInfo(data, CURRENT_PAGE);
+//		GetPsInfo(data); //process정보를 data에 얻어온다. 여기다 이걸 넣어버리면, 업데이트 기능이 필요가없다.. 일단 주석처리
 	}
 
 

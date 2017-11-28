@@ -195,6 +195,7 @@ void PrintPsInfo(topData *data, int signal) {
 	if(signal == INIT_PAGE){
 		currentIndex =0;
 		page = 1;
+		signal = CURRENT_PAGE;
 	}
 	if(signal == CURRENT_PAGE){
 		for(i=currentIndex; i<page*15;i++){
@@ -308,6 +309,7 @@ void SearchData(char *str, topData *data)
 	char cmp[2][20] = {"pid", "command"};
 	int value;
 	char strValue[20];
+	int flag;
 
 	if( !strcmp(str, cmp[0]) )
 		tf = 0;
@@ -316,30 +318,38 @@ void SearchData(char *str, topData *data)
 
 	switch(tf){
 		case 0:
-			printf("검색할 PID를 입력하세요 : ");
+			printf("input PID : ");
 			scanf("%d", &value);
 			ClearReadBuffer();
 			break;
 		case 1:
-			printf("검색할 COMMAND를 입력하세요 : ");
+			printf("input COMMAND : ");
 			scanf("%s", strValue);
 			ClearReadBuffer();
 			break;
 	}
 
+	flag =0;
 	while(i < processCount)
 	{
 		switch(tf){
 			case 0:
-				if(data[i].pid == value)
-					PrintData(data[i].pid, data);
+				if(data[i].pid == value){	
+					PrintProcess(data[i]);
+					flag = 1;
+				}
 				break;
 			case 1:
-				if( !strcmp(data[i].command, strValue) )
-					PrintData(data[i].pid, data);
+				if( !strcmp(data[i].command, strValue) ){
+					PrintProcess(data[i]);
+					flag = 1;
+				}
 				break;
 		}
 		i++;
+	}
+	if(flag == 0){
+		printf("not exist process\n");
 	}
 }
 
