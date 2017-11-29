@@ -80,6 +80,6 @@ int main(void) {
 		}
 	//	PrintPsInfo(data, CURRENT_PAGE);
 	//	GetPsInfo(data); //process정보를 data에 얻어온다. 여기다 이걸 넣어버리면, 업데이트 기능이 필요가없다.. 일단 주석처리
-
+	}
 	return 0;
 }

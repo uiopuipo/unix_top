@@ -1,62 +1,59 @@
 #include <dirent.h> 
-#include <unistd.h>
 #include <errno.h> 
 #include <fcntl.h>
+#include <procfs.h>
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <string.h> 
 #include <signal.h>
-#include <procfs.h>
 #include <termios.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/syscall.h>
 #include <sys/uio.h>
-#include <signal.h>
 
 //define
-//OptSort()í•¨ìˆ˜ì˜ signal
-#define SORT_SIZE 1 //sizeë³„ë¡œ ì •ë ¬í•  ë•Œ
-#define SORT_PID 2 //pidë³„ë¡œ ì •ë ¬í•  ë•Œ
-#define SORT_RES 3 //resë³„ë¡œ ì •ë ¬í•  ë•Œ
+//OptSort()ÇÔ¼öÀÇ signal
+#define SORT_SIZE 1 //sizeº°·Î Á¤·ÄÇÒ ¶§
+#define SORT_PID 2 //pidº°·Î Á¤·ÄÇÒ ¶§
+#define SORT_RES 3 //resº°·Î Á¤·ÄÇÒ ¶§
 
-//PrintPsInfo()í•¨ìˆ˜ì˜ signal
-#define FRONT_PAGE 1 //ì´í›„ í˜ì´ì§€ë¡œ ë„˜ì–´ê°ˆ ë•Œ 
-#define BACK_PAGE 2 //ì´ì „ í˜ì´ì§€ë¡œ ë„˜ê¸¸ ë•Œ
-#define INIT_PAGE 3 //ì—…ë°ì´íŠ¸ í•  ì‹œ ì´ˆê¸°í™”
-#define CURRENT_PAGE 4 //í˜„ì¬ í˜ì´ì§€ë¥¼ ì¶œë ¥í•˜ê³  ì‹¶ì„ ë•Œ
+//PrintPsInfo()ÇÔ¼öÀÇ signal
+#define FRONT_PAGE 1 //ÀÌÈÄ ÆäÀÌÁö·Î ³Ñ¾î°¥ ¶§ 
+#define BACK_PAGE 2 //ÀÌÀü ÆäÀÌÁö·Î ³Ñ±æ ¶§
+#define INIT_PAGE 3 //¾÷µ¥ÀÌÆ® ÇÒ ½Ã ÃÊ±âÈ­
+#define CURRENT_PAGE 4 //ÇöÀç ÆäÀÌÁö¸¦ Ãâ·ÂÇÏ°í ½ÍÀ» ¶§
 
-//ë°›ì•„ì˜¬ í”„ë¡œì„¸ìŠ¤ í•œì •ì¹˜
+//¹Ş¾Æ¿Ã ÇÁ·Î¼¼½º ÇÑÁ¤Ä¡
 #define MAX_DATA_SIZE 400
 
-//PrintPsInfo()í•¨ìˆ˜ì˜ í”„ë¡œì„¸ìŠ¤ ë³´ì—¬ì¤„ ê°’
+//PrintPsInfo()ÇÔ¼öÀÇ ÇÁ·Î¼¼½º º¸¿©ÁÙ °ª
 #define MAX_SHOW_PROCESS 15
 
-//í™”ë©´ì— ë³´ì—¬ì¤„ top êµ¬ì¡°ì²´ ìš”ì†Œ.
-typedef struct top{
-	int pid; //í”„ë¡œì„¸ìŠ¤ id
-	int lwp; //
-	char command[64]; //ëª…ë ì–´
-	char time[8]; //ì‹œê°„
-	int size; //í”„ë¡œì„¸ìŠ¤ size
-	int res;
-	int mem;
+//È­¸é¿¡ º¸¿©ÁÙ top ±¸Á¶Ã¼ ¿ä¼Ò.
+typedef struct top {
+	int pid; //ÇÁ·Î¼¼½º id
+	int lwp; //¾²·¹µå °¹¼ö
+	char command[64]; //¸í··¾î
+	char time[8]; //½Ã°£
+	int size; //ÇÁ·Î¼¼½º¿¡ ÇÒ´çµÈ ÃÑ ¸Ş¸ğ¸®ÀÇ ¾ç
+	int res; //ÇÁ·Î¼¼½º¿¡ ÀÇÇØ »ç¿ëµÈ ¹°¸® ¸Ş¸ğ¸®ÀÇ ¾ç
 } topData;
 
-
 //funciton
-void SearchData(char *str, topData *data); //íŠ¹ì • í”„ë¡œì„¸ìŠ¤ ì •ë³´ë¥¼ ì°¾ê¸°ìœ„í•œ í•¨ìˆ˜.
-void PrintPsInfo(topData *data, int signal); //í”„ë¡œì„¸ìŠ¤ ì •ë³´ë¥¼ ì¶œë ¥í•œë‹¤.
-void PrintMainInfo(); //top í”„ë¡œê·¸ë¨ì˜ ê¸°ë³¸ ì •ë³´ ë° ì£¼ìš”ë‚´ìš© ì¶œë ¥
-void GetPsInfo(topData *data); //dataì— í”„ë¡œì„¸ìŠ¤ ì •ë³´ ë°›ì•„ì˜¤ê¸°.
-struct top OpenPsinfo(int pid); //processì˜ ì •ë³´ë¥¼ ì—´ê¸°.
-void ChangePos(topData *a, topData *b); //êµ¬ì¡°ì²´ ë°”ê¾¸ê¸°
-void ClearReadBuffer(); //ë²„í¼ë¥¼ ë¹„ìš°ê¸° ìœ„í•œ í•¨ìˆ˜.
-void InitData(topData *data); //Dataì˜ ë°°ì—´ì„ ì´ˆê¸°í™” í•˜ê¸°ìœ„í•œ í•¨ìˆ˜
-int GetDataSize(topData *data); //í”„ë¡œì„¸ìŠ¤ ê°œìˆ˜ êµ¬í•˜ëŠ” í•¨ìˆ˜
-void PrintHelpInfo(); //Top ì‚¬ìš©ë²•ê³¼ ì˜µì…˜ ì„¤ëª…
+void SearchData(char *str, topData *data); //Æ¯Á¤ ÇÁ·Î¼¼½º Á¤º¸¸¦ Ã£±âÀ§ÇÑ ÇÔ¼ö.
+void PrintPsInfo(topData *data, int signal); //ÇÁ·Î¼¼½º Á¤º¸¸¦ Ãâ·ÂÇÑ´Ù.
+void PrintMainInfo(); //top ÇÁ·Î±×·¥ÀÇ ±âº» Á¤º¸ ¹× ÁÖ¿ä³»¿ë Ãâ·Â
+void GetPsInfo(topData *data); //data¿¡ ÇÁ·Î¼¼½º Á¤º¸ ¹Ş¾Æ¿À±â.
+struct top OpenPsinfo(int pid); //processÀÇ Á¤º¸¸¦ ¿­±â.
+void ChangePos(topData *a, topData *b); //±¸Á¶Ã¼ ¹Ù²Ù±â
+void ClearReadBuffer(); //¹öÆÛ¸¦ ºñ¿ì±â À§ÇÑ ÇÔ¼ö.
+void InitData(topData *data); //DataÀÇ ¹è¿­À» ÃÊ±âÈ­ ÇÏ±âÀ§ÇÑ ÇÔ¼ö
+int GetDataSize(topData *data); //ÇÁ·Î¼¼½º °³¼ö ±¸ÇÏ´Â ÇÔ¼ö
+void PrintHelpInfo(); //Top »ç¿ë¹ı°ú ¿É¼Ç ¼³¸í
 
-//option fucntion
-void OptKill(); //íŠ¹ì • í”„ë¡œì„¸ë¥¼ ì¢…ë£Œì‹œí‚¤ê¸° ìœ„í•œ í•¨ìˆ˜
+//option function
+void OptKill(); //Æ¯Á¤ ÇÁ·Î¼¼¸¦ Á¾·á½ÃÅ°±â À§ÇÑ ÇÔ¼ö
 int OptSort(topData *data,int size, int flag);

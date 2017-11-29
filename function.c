@@ -3,14 +3,14 @@
 ///////////////
 //Option Part//
 ///////////////
-//í˜„ì¬ ì‹¤í–‰ë˜ê³ ìˆëŠ” íŒŒì¼ êµ¬ì¡°ì²´ë¥¼ ê°€ì ¸ì˜¨ë‹¤.
+
 void OptKill(){
-	int targetPID;
-	short flag;
+	int targetPID; //½Ã±×³ÎÀ» º¸³¾ pid
+	short flag; //¿À·ù Ã³¸®¸¦ À§ÇÑ º¯¼ö
 
 	printf("PID to signal/kill [default pid = 1234] ");
-	scanf("%d",&targetPID); //killí•  pidì…ë ¥. 
-	ClearReadBuffer();
+	scanf("%d",&targetPID); //½Ã±×³ÎÀ» º¸³¾ pidÀÔ·Â
+	ClearReadBuffer(); //¹öÆÛ¸¦ ºñ¿î´Ù
 
 	if(flag = kill(targetPID, SIGKILL) < 0 ){
 		printf("%d PID is not exist or you have to get permission \n",targetPID);
@@ -19,12 +19,12 @@ void OptKill(){
 	}
 }
 
-//ì •ë ¬í•˜ê³ ì‹¶ì€ ë°°ì—´, ë°°ì—´ì˜ ê°œìˆ˜, FLAGê°’ì„ ì¸ìë¡œ ë°›ëŠ”ë‹¤.
+//Á¤·Ä ÇÏ°í½ÍÀº ¹è¿­, ¹è¿­ÀÇ °³¼ö, flag(Á¤·Ä ±âÁØ)À» ÀÎÀÚ·Î ¹Ş´Â´Ù.
 int OptSort(topData *data, int size, int flag){
-	int i, j;
-	topData key;
+	int i, j; //¹İº¹¹® Á¦¾î º¯¼ö
+	topData key; 
 
-
+	//¿À·ùÃ³¸® ºÎºĞ
 	if(size <= 0) {
 		printf("OptSort: size error\n");
 		return -1;
@@ -74,64 +74,59 @@ int OptSort(topData *data, int size, int flag){
 //Function Part//
 /////////////////
 
-//ë²„í¼ë¥¼ ë¹„ìš°ê¸° ìœ„í•œ í•¨ìˆ˜.
+//¹öÆÛ¸¦ ºñ¿ì±â À§ÇÑ ÇÔ¼ö.
 void ClearReadBuffer(){
 	if(stdin->_cnt)
 		while(getchar() != '\n');
 }
 
-//data ë°°ì—´ ì´ˆê¸°í™”.
+//data ¹è¿­ ÃÊ±âÈ­.
 void InitData(topData *data) {
 	int i;
 
-	for(i=0;i<MAX_DATA_SIZE;i++){
-		data[i].pid=-1;//pidë¥¼ -1ë¡œ ì„¤ì •í•¨.
+	for(i=0; i<MAX_DATA_SIZE; i++){
+		data[i].pid = -1;//pid¸¦ -1·Î ¼³Á¤
 	}
 }
 
-//í”„ë¡œì„¸ìŠ¤ ê°œìˆ˜ë¥¼ êµ¬í•¨
+//ÇÁ·Î¼¼½º °³¼ö¸¦ ±¸ÇÑ´Ù.
 int GetDataSize(topData *data){
 	int i;
 	int count=0;
 
-	for(i=0;i<MAX_DATA_SIZE;i++){
-		if(data[i].pid == -1)//pidê°€ -1ì¼ë•Œê¹Œì§€ loop
+	for(i=0; i<MAX_DATA_SIZE; i++){
+		if(data[i].pid == -1)//pid°¡ -1ÀÌ µÉ ¶§±îÁö ¹İº¹
 			break;
 		count++;
 	}
 	return count;
 }
 
-//í•˜ë‚˜ì˜ í”„ë¡œì„¸ìŠ¤ê°’ ì¶œë ¥
+//ÇÁ·Î¼¼½º Á¤º¸¸¦ ³Ö¾îµĞ topData ±¸Á¶Ã¼¸¦ ¹Ş¾Æ ³»¿ëÀ» Ãâ·ÂÇÑ´Ù.
 void PrintProcess(topData data){
-	printf(" PID:%-6d  LWP:%-4d  SIZE:%-6d  RES:%-6d  TIME:%-6s  MEM:%-4d  COMMAND:%-10s\n " ,data.pid, data.lwp, data.size, data.res, data.time, data.mem, data.command);
-//	printf("PID:%d ", data.pid);
-//	printf("LWP:%d COMMAND:%s ", data.lwp, data.command);
-//	printf("SIZE:%d RES:%d ", data.size, data.res);
-//	printf("TIME: %s ", data.time);
-//	printf("COMMAND: %s \n", data.command);
+	printf(" PID:%-6d  LWP:%-4d  SIZE:%-6d  RES:%-6d  TIME:%-6s  COMMAND:%-10s\n " ,data.pid, data.lwp, data.size, data.res, data.time, data.command);
 }
 
-
+// /proc µğ·ºÅä¸®¸¦ ¼øÈ¸ÇÏ¸é¼­ °¢ pid¸¶´Ù ÆÄÀÏÀ» ¿­¾î Á¤º¸¸¦ ¾ò¾î¿Ã ÁØºñ¸¦ ÇÑ´Ù.
 void GetPsInfo(topData *data){
-	DIR *dp;
-	int pid;
-	int count=0;
-	struct dirent *dent;
+	DIR *dp; //µğ·ºÅä¸® Æ÷ÀÎÅÍ
+	int pid; 
+	int count = 0; //¹è¿­ÀÇ °¹¼ö¸¦ ¼¼±âÀ§ÇÑ º¯¼ö
+	struct dirent *dent; //µğ·ºÅä¸® Æ÷ÀÎÅÍ°¡ °¡¸®Å°´Â ÆÄÀÏÀÇ Á¤º¸¸¦ ´ã´Â´Ù.
     char dirName[] = "/proc";
 
-	dp = opendir(dirName); // /proc ë””ë ‰í† ë¦¬ë¥¼ ì—´ì–´ 
+	dp = opendir(dirName); // /proc µğ·ºÅä¸®¸¦ ¿¬´Ù.
     if(dp == NULL) {
 		printf("ERROR: Could not open directory(%s).\n", dirName);
 		exit(1);
 	}
 
-	while((dent=readdir(dp))) {//ë””ë ‰í† ë¦¬ ì •ë³´ë¥¼ ì½ì–´ dentê°€ ê°€ë¦¬í‚¤ê²Œ í•œë‹¤.
-		pid = atoi(dent->d_name);
-		data[count] = OpenPsinfo(pid);
+	while((dent=readdir(dp))) { //µğ·ºÅä¸® Á¤º¸¸¦ ÀĞ¾î dent°¡ °¡¸®Å°°Ô ÇÑ´Ù.
+		pid = atoi(dent->d_name); //procÀÇ ¼­ºê µğ·ºÅä¸® ÀÌ¸§Àº pidÀÌ´Ù.
+		data[count] = OpenPsinfo(pid); //data ¹è¿­¿¡ ÇÁ·Î¼¼½º Á¤º¸¸¦ ´ã´Â´Ù.
 		count++;
 	}
-	data[count].pid = -1; //ë’·ë¶€ë¶„ì—ëŠ” pidê°’ì„ -1ë¡œ í•´ì¤Œ. Updateí•  ì‹œ ì´ì „ì— ë°›ì•„ì˜¨ë°ì´í„°ë¥¼ ê±¸ëŸ¬ë‚´ê¸° ìœ„í•´ì„œ.
+	data[count].pid = -1; //µŞºÎºĞ¿¡´Â pid°ªÀ» -1·Î ÇØÁÜ. »õ·Î°íÄ§ ÇÒ ¶§ ÀÌÀü¿¡ ¹Ş¾Æ¿Â µ¥ÀÌÅÍ¸¦ °É·¯³»±â À§ÇØ¼­.
 
 
     if(closedir(dp) < 0) {
@@ -140,59 +135,64 @@ void GetPsInfo(topData *data){
 	}
 }
 
-//topí”„ë¡œê·¸ë¨ í™”ë©´ ìœ„ì— ë³´ì—¬ì£¼ëŠ”ë¶€ë¶„ ì¶œë ¥
+//topÇÁ·Î±×·¥ È­¸é À§¿¡ º¸¿©ÁÖ´Â ºÎºĞ Ãâ·Â
 void PrintMainInfo(){
 	printf("----------------------------------------------------------------------------------\n");
-	printf("                                      Top program            \n");
-	printf("                                     Help press 'h'          \n");
+	printf("                                   Top program            \n");
+	printf("                                  Help press 'h'          \n");
 	printf("----------------------------------------------------------------------------------\n");
 	
-	printf("    PID         LWP       SIZE         RES         TIME         MEM       COMMAND\n ");
+	printf("    PID         LWP       SIZE         RES         TIME          COMMAND\n ");
 }
 
-//í”„ë¡œì„¸ìŠ¤ ì •ë³´ ì¶œë ¥.
+//ÇÁ·Î¼¼½º Á¤º¸ Ãâ·Â
+//signal·Î ÃÊ±âÈ­, ÀÌÀü/ÇöÀç/´ÙÀ½ ÆäÀÌÁö ¸í·ÉÀ» ±¸ºĞÇÑ´Ù
 void PrintPsInfo(topData *data, int signal) {
 	static int currentIndex=0;
 	static int page = 1;
 	int i;
 	int processCount = GetDataSize(data);
 	
-	// ì—…ë°ì´íŠ¸ì‹œ ì´ˆê¸°í™”
+	// »õ·Î°íÄ§ ÇÒ ½Ã ÃÊ±âÈ­
 	if(signal == INIT_PAGE){
 		currentIndex =0;
 		page = 1;
 		signal = CURRENT_PAGE;
 	}
+
+	//ÇöÀç ÆäÀÌÁö
 	if(signal == CURRENT_PAGE){
-		for(i=currentIndex; i<page*MAX_SHOW_PROCESS;i++){
+		for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++){
 			PrintProcess(data[i]);
 		}
 	}
 
-	if(signal == FRONT_PAGE){//ì•í˜ì´ì§€ë¥¼ ëˆ„ë¥¼ ë•Œ 
-		if(currentIndex + MAX_SHOW_PROCESS > processCount) { // ë§¨ ë’·ë¶€ë¶„ì´ë©´
-			for(i=currentIndex;i<processCount;i++){ //ê·¸ëƒ¥ í˜„ìœ„ì¹˜ì—ì„œ
+	//´ÙÀ½ ÆäÀÌÁö
+	if(signal == FRONT_PAGE){
+		if(currentIndex + MAX_SHOW_PROCESS > processCount) { //¸Ç µŞºÎºĞÀÌ¸é
+			for(i=currentIndex;i<processCount;i++){ //Çö À§Ä¡¿¡¼­
 				PrintProcess(data[i]);
 			}
-		} else {//ë§¨ ë’·ë¶€ë¶„ì´ ì•„ë‹ˆë©´
+		} else { //¸Ç µŞºÎºĞÀÌ ¾Æ´Ï¸é
 			currentIndex += MAX_SHOW_PROCESS;
-			page++; //ì¶œë ¥ í›„ ë„˜ì–´ê°€
+			page++; //Ãâ·Â ÈÄ ³Ñ¾î°¡±â
 			for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++){
 				if(i< processCount){
 					PrintProcess(data[i]);
-
 				}
 			} 
 		}
 	}
-	if(signal ==BACK_PAGE){//ë’·í˜ì´ì§€ë¥¼ ëˆŒë €ì„ ì‹œ
-		if(currentIndex < MAX_SHOW_PROCESS) {//ì²«í˜ì´ì§€ë©´ ê·¸ëƒ¥ ì¶œë ¥.
+
+	//ÀÌÀü ÆäÀÌÁö
+	if(signal == BACK_PAGE){
+		if(currentIndex < MAX_SHOW_PROCESS) {//Ã¹ ÆäÀÌÁö¸é ±×³É Ãâ·Â
 			for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++)
 					PrintProcess(data[i]);
 		} else {
 			currentIndex -= MAX_SHOW_PROCESS;
 			page--;
-			for(i=currentIndex; i < page*MAX_SHOW_PROCESS; i++){
+			for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++){
 					PrintProcess(data[i]);
 			}
 		}
@@ -201,97 +201,101 @@ void PrintPsInfo(topData *data, int signal) {
 	printf("page : %d \n", page);
 }
 
+// /proc/pid/psinfo ÆÄÀÏÀ» ¿­¾î¼­ topData ±¸Á¶Ã¼¿¡ Á¤º¸¸¦ ÀúÀåÇÑ´Ù.
 topData OpenPsinfo(int pid)
 {
-	int fd;
-	char fileName[1024]; //proc/PID/ê°ì¢… ì •ë³´íŒŒì¼
-	char buffer[512];
-	psinfo_t data;
-	topData t_data;
+	int fd; //ÆÄÀÏ ÀÔÃâ·ÂÀ» À§ÇÑ º¯¼ö
+	char fileName[1024]; //proc/PID/°¢Á¾ Á¤º¸ÆÄÀÏ
+	psinfo_t data; //psinfo¸¦ ÀĞ¾î¿À±â À§ÇÑ ±¸Á¶Ã¼
+	topData t_data; //psinfo¿¡¼­ ÇÊ¿äÇÑ Á¤º¸¸¸À» °ñ¶ó¼­ ÀúÀåÇÒ ±¸Á¶Ã¼
 
-	int lwp=0; //ë°ì´í„°ë¥¼ êº¼ë‚´ ì €ì¥í•  ë³€ìˆ˜ë“¤
-	char *command;
-	int size, res, mem;
-	char *dmodel;
-	timestruc_t time;
-	int hour, min;
-	char t_result[8];
+	//µ¥ÀÌÅÍ¸¦ ²¨³» ÀúÀåÇÒ ÀÓ½Ãº¯¼öµé
+	int lwp = 0; //¾²·¹µåÀÇ °³¼ö
+	char *command; //ÇÁ·Î¼¼½º¸¦ ½ÇÇàÇÑ Ä¿¸Çµå
+	int size; //ÇÁ·Î¼¼½º¿¡ ÇÒ´çµÈ ÃÑ ¸Ş¸ğ¸®ÀÇ ¾ç
+	int res; //ÇÁ·Î¼¼½º¿¡ ÀÇÇØ »ç¿ëµÈ ¹°¸® ¸Ş¸ğ¸®ÀÇ ¾ç
+	timestruc_t time; //ÇÁ·Î¼¼½º°¡ »ç¿ëÇÑ CPU ½Ã°£
+	int hour, min; //time¿¡¼­ ½Ã°£, ºĞÀ» »©¿Ã º¯¼ö
+	char t_result[8]; //hour + minÀ» ¹®ÀÚ¿­·Î ÀúÀåyy
 
 	
-	memset(&data, 0, sizeof(psinfo_t));
-	sprintf(fileName, "/proc/%d/psinfo", pid);
+	memset(&data, 0, sizeof(psinfo_t)); //±¸Á¶Ã¼ ÃÊ±âÈ­
+	sprintf(fileName, "/proc/%d/psinfo", pid); //¿©·¯ pid¸¦ Ã³¸®ÇÏ±â À§ÇØ ¹®ÀÚ¿­À» ¸¸µç´Ù.
 	
-	if((fd = open(fileName, O_RDONLY)) < 0) 
+	if((fd = open(fileName, O_RDONLY)) < 0) //ÆÄÀÏ ¿­±â
 	{
 		printf("ERROR: %s open failed\n", fileName);
 	}
-	read(fd, &data, sizeof(psinfo_t));
+	read(fd, &data, sizeof(psinfo_t)); //ÆÄÀÏ ÀĞ±â
 
+	//ÀÓ½Ãº¯¼ö¿¡ Á¤º¸¸¦ ÀúÀå
 	lwp = data.pr_nlwp;
 	command = data.pr_fname;
 	size = data.pr_size;
 	res = data.pr_rssize;
-	mem = data.pr_pctmem;
 	time = data.pr_time;
 	hour = time.tv_sec / 60;
-	min = time.tv_sec % 60;
-	if(min < 10)
+	min = time.tv_sec % 60; 
+	if(min < 10) //hour + minÀ» ¹®ÀÚ¿­·Î ÀúÀå
 		sprintf(t_result, "%d:0%d", hour, min);
 	else 
 		sprintf(t_result, "%d:%d", hour, min);
 
+	//½ÇÁ¦·Î ´Ù·ê topData ±¸Á¶Ã¼¿¡ Á¤º¸¸¦ ´ã´Â´Ù.
 	t_data.pid = pid;
 	t_data.lwp = (int)lwp;
 	t_data.size = (int)size;
 	t_data.res = (int)res;
-	t_data.mem = (int)mem;
 	strcpy(t_data.command, command);
 	strcpy(t_data.time, t_result);
 	close(fd);
 
-	return t_data;
+	return t_data; //Á¤º¸¸¦ ´ãÀº topData ±¸Á¶Ã¼ ¹İÈ¯
 }
 
+//»ç¿ëÀÚ·ÎºÎÅÍ pid, command Áß¿¡ ¹«¾ùÀ» °Ë»öÇÒ Áö ÀÔ·Â¹Ş°í
+//ÀÔ·Â¹ŞÀº Á¤º¸¸¦ °Ë»öÇÏ¿© Ãâ·ÂÇÑ´Ù.
 void SearchData(char *str, topData *data)
 {
-	int i = 0;
-	int tf = -1;
-	char cmp[2][20] = {"pid", "command"};
-	int value;
-	char strValue[20];
-	int flag;
-	int processCount = GetDataSize(data);
+	int i = 0; //¹İº¹¹® Á¦¾î º¯¼ö
+	int tf = -1; //°Ë»öÇÒ Ç×¸ñÀÌ pid¶ó¸é 0, command¶ó¸é 1
+	char cmp[2][20] = {"pid", "command"}; //str ¹®ÀÚ¿­°ú ºñ±³¸¦ À§ÇÑ ¹è¿­
+	int value; //pid·Î °Ë»öÇÑ´Ù¸é Ã£À» pid¸¦ ÀÔ·Â¹Ş´Â´Ù.
+	char strValue[20];//command·Î °Ë»öÇÑ´Ù¸é Ã£À» command¸¦ ÀÔ·Â¹Ş´Â´Ù.
+	int flag; //ÇÁ·Î¼¼½º°¡ Á¸ÀçÇÏ´Â Áö ¿©ºÎ¸¦ Ã¼Å©
+	int processCount = GetDataSize(data); //ÇÁ·Î¼¼½º °³¼ö
 	
 
+	//°Ë»öÇÒ Ç×¸ñÀÌ pid¶ó¸é 0, command¶ó¸é 1
 	if( !strcmp(str, cmp[0]) )
 		tf = 0;
 	if( !strcmp(str, cmp[1]) )
 		tf = 1;
 
 	switch(tf){
-		case 0:
+		case 0: //°Ë»öÇÒ pid¸¦ ÀÔ·Â¹Ş´Â´Ù
 			printf("input PID : ");
 			scanf("%d", &value);
 			ClearReadBuffer();
 			break;
-		case 1:
+		case 1: //°Ë»öÇÒ command¸¦ ÀÔ·Â¹Ş´Â´Ù
 			printf("input COMMAND : ");
 			scanf("%s", strValue);
 			ClearReadBuffer();
 			break;
 	}
 
-	flag =0;
+	flag = 0;
 	while(i < processCount)
 	{
 		switch(tf){
-			case 0:
-				if(data[i].pid == value){	
+			case 0: //pid·Î °Ë»ö
+				if(data[i].pid == value){
 					PrintProcess(data[i]);
 					flag = 1;
 				}
 				break;
-			case 1:
+			case 1: //command·Î °Ë»ö
 				if( !strcmp(data[i].command, strValue) ){
 					PrintProcess(data[i]);
 					flag = 1;
@@ -305,6 +309,7 @@ void SearchData(char *str, topData *data)
 	}
 }
 
+//µµ¿ò¸»À» º¸¿©ÁØ´Ù.
 void PrintHelpInfo(){
 	printf("'k' : kill process \n");
 	printf("'s' : sort process\n");
