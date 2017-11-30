@@ -12,7 +12,7 @@ void OptKill(){
 	scanf("%d",&targetPID); //시그널을 보낼 pid입력
 	ClearReadBuffer(); //버퍼를 비운다
 
-	if(flag = kill(targetPID, SIGKILL) < 0 ){
+	if(flag = kill(targetPID, SIGKILL) < 0 ){//입력한 pid의 프로세스를 죽인다.
 		printf("%d PID is not exist or you have to get permission \n",targetPID);
 	} else { 
 		printf("%d PID is deleted \n",targetPID);
@@ -25,16 +25,16 @@ int OptSort(topData *data, int size, int flag){
 	topData key; 
 
 	//오류처리 부분
-	if(size <= 0) {
+	if(size <= 0) { //size 오류시
 		printf("OptSort: size error\n");
 		return -1;
-	} else if(data == NULL) {
+	} else if(data == NULL) { //구조체가 널일 경우
 		printf("OptSort: data error\n");
 		return -1;
 	}
 
-	switch(flag) {
-		case SORT_SIZE:
+	switch(flag) {//flag값에 따라 정렬할 것을 결정한다.
+		case SORT_SIZE: //size로 정렬 
 			for(i=1; i< size; i++){
 				key = data[i];
 				for(j=i-1; j>=0 && key.size > data[j].size ; j--){
@@ -43,7 +43,7 @@ int OptSort(topData *data, int size, int flag){
 				data[j+1] = key;
 			}
 			break;
-		case SORT_PID:
+		case SORT_PID://pid로 정렬
 			for(i=1; i< size; i++){
 				key = data[i];
 				for(j=i-1; j>=0 && key.pid > data[j].pid; j--){
@@ -52,7 +52,7 @@ int OptSort(topData *data, int size, int flag){
 				data[j+1] = key;
 			}
 			break;
-		case SORT_RES:
+		case SORT_RES://res로 정렬
 			for(i=1; i< size; i++){
 				key = data[i];
 				for(j=i-1; j>=0 && key.res > data[j].res ; j--){
@@ -61,7 +61,7 @@ int OptSort(topData *data, int size, int flag){
 				data[j+1] = key;
 			}
 			break;
-		default :
+		default : //flag값을 잘못 넣었을 시 오류출력
 			printf("OptSort Flag error!\n");
 			return -1;
 			break;
@@ -154,31 +154,41 @@ void PrintPsInfo(topData *data, int signal) {
 	int processCount = GetDataSize(data);
 	
 	// 새로고침 할 시 초기화
-	if(signal == INIT_PAGE){
-		currentIndex =0;
-		page = 1;
-		signal = CURRENT_PAGE;
+	if(signal == INIT_PAGE){ //초기화일때
+		currentIndex =0;//현재 index 0
+		page = 1;//page 1로 만듬
+		signal = CURRENT_PAGE; //현재 페이지를 출력하기위해 시그널을 바꿈.
 	}
 
 	//현재 페이지
 	if(signal == CURRENT_PAGE){
-		for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++){
-			PrintProcess(data[i]);
+		for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++){//현재 페이지를 출력
+			if(i < processCount){//출력하는 개수가 프로세스 개수를 안넘으면
+				PrintProcess(data[i]);//출력
+			}else {//넘으면
+				printf("\n");//공백으로 출력
+			}
 		}
 	}
 
 	//다음 페이지
 	if(signal == FRONT_PAGE){
-		if(currentIndex + MAX_SHOW_PROCESS > processCount) { //맨 뒷부분이면
-			for(i=currentIndex;i<processCount;i++){ //현 위치에서
-				PrintProcess(data[i]);
+		if(currentIndex + MAX_SHOW_PROCESS >= processCount) { //맨 뒷부분이면
+			for(i=currentIndex;i< page * MAX_SHOW_PROCESS;i++){ //현 위치에서
+				if(i < processCount){//출력하는 개수가 프로세스 개수를 안넘으면
+					PrintProcess(data[i]);//프로세스 나머지 부분 출력
+				}else {//넘으면
+					printf("\n");//공백으로 출력
+				}
 			}
 		} else { //맨 뒷부분이 아니면
 			currentIndex += MAX_SHOW_PROCESS;
 			page++; //출력 후 넘어가기
-			for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++){
-				if(i< processCount){
-					PrintProcess(data[i]);
+			for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++){//MAX_SHOW_PROCESS값 만큼 출력
+				if(i< processCount){//출력하는 개수가 프로세스 개수를 안넘으면
+					PrintProcess(data[i]);//출력한다
+				} else {
+					printf("\n");//공백으로 출력.
 				}
 			} 
 		}
@@ -198,7 +208,7 @@ void PrintPsInfo(topData *data, int signal) {
 		}
 	}
 
-	printf("page : %d \n", page);
+	printf(" page : %d \n", page);
 }
 
 // /proc/pid/psinfo 파일을 열어서 topData 구조체에 정보를 저장한다.

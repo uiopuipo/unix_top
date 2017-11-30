@@ -47,6 +47,8 @@ int main(void) {
 							break;
 					}
 				}
+				system("clear");
+				PrintMainInfo();
 				PrintPsInfo(data, CURRENT_PAGE);
 				break;
 			case 'f': //검색 옵션
@@ -76,6 +78,7 @@ int main(void) {
 				exit(1);
 				break;
 			default :
+				PrintPsInfo(data, CURRENT_PAGE);
 				break;
 		}
 	//	PrintPsInfo(data, CURRENT_PAGE);
@@ -83,3 +86,4 @@ int main(void) {
 	}
 	return 0;
 }
+
