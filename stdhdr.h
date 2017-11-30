@@ -1,3 +1,5 @@
+#ifndef _TOP_
+#define _TOP_
 #include <dirent.h> 
 #include <errno.h> 
 #include <fcntl.h>
@@ -57,3 +59,4 @@ void PrintHelpInfo(); //Top 사용법과 옵션 설명
 //option function
 void OptKill(); //특정 프로세를 종료시키기 위한 함수
 int OptSort(topData *data,int size, int flag);
+#endif
