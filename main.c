@@ -55,7 +55,7 @@ int main(void) {
 				PrintPsInfo(data, CURRENT_PAGE);
 				{
 					char str[20];
-					printf("검색할 항목을 입력하세요(pid, command) : ");
+					printf("검색할 항목을 입력하세요(pid, username, command) : ");
 					scanf("%s", str);
 					SearchData(str, data); //pid 또는 command로 검색
 				}
