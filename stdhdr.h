@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <termios.h>
 #include <unistd.h>
+#include <pwd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/param.h>
@@ -42,6 +43,7 @@ typedef struct top {
 	char time[8]; //시간
 	int size; //프로세스에 할당된 총 메모리의 양
 	int res; //프로세스에 의해 사용된 물리 메모리의 양
+	char username[64]; //사용자 이름
 } topData;
 
 //funciton

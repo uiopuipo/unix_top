@@ -1,5 +1,4 @@
 #include "stdhdr.h"
-
 ///////////////
 //Option Part//
 ///////////////
@@ -104,7 +103,7 @@ int GetDataSize(topData *data){
 
 //프로세스 정보를 넣어둔 topData 구조체를 받아 내용을 출력한다.
 void PrintProcess(topData data){
-	printf(" PID:%-6d  LWP:%-4d  SIZE:%-6d  RES:%-6d  TIME:%-6s  COMMAND:%-10s\n " ,data.pid, data.lwp, data.size, data.res, data.time, data.command);
+	printf(" PID:%-6d  USERNAME:%-10s  LWP:%-4d  SIZE:%-6d  RES:%-6d  TIME:%-6s  COMMAND:%-10s\n " ,data.pid, data.username, data.lwp, data.size, data.res, data.time, data.command);
 }
 
 // /proc 디렉토리를 순회하면서 각 pid마다 파일을 열어 정보를 얻어올 준비를 한다.
@@ -142,7 +141,7 @@ void PrintMainInfo(){
 	printf("                                  Help press 'h'          \n");
 	printf("----------------------------------------------------------------------------------\n");
 	
-	printf("    PID         LWP       SIZE         RES         TIME          COMMAND\n ");
+	printf("    PID         USERNAME              LWP       SIZE         RES         TIME          COMMAND\n ");
 }
 
 //프로세스 정보 출력
@@ -218,6 +217,7 @@ topData OpenPsinfo(int pid)
 	char fileName[1024]; //proc/PID/각종 정보파일
 	psinfo_t data; //psinfo를 읽어오기 위한 구조체
 	topData t_data; //psinfo에서 필요한 정보만을 골라서 저장할 구조체
+	struct passwd *pw;
 
 	//데이터를 꺼내 저장할 임시변수들
 	int lwp = 0; //쓰레드의 개수
@@ -227,7 +227,7 @@ topData OpenPsinfo(int pid)
 	timestruc_t time; //프로세스가 사용한 CPU 시간
 	int hour, min; //time에서 시간, 분을 빼올 변수
 	char t_result[8]; //hour + min을 문자열로 저장yy
-
+	int uid; //사용자 이름을 얻기 위해 uid를 얻는다.
 	
 	memset(&data, 0, sizeof(psinfo_t)); //구조체 초기화
 	sprintf(fileName, "/proc/%d/psinfo", pid); //여러 pid를 처리하기 위해 문자열을 만든다.
@@ -251,6 +251,10 @@ topData OpenPsinfo(int pid)
 	else 
 		sprintf(t_result, "%d:%d", hour, min);
 
+	//passwd 파일을 읽어 사용자 이름을 얻는다.
+	uid = (int)data.pr_uid;
+	pw = getpwuid(uid); 
+
 	//실제로 다룰 topData 구조체에 정보를 담는다.
 	t_data.pid = pid;
 	t_data.lwp = (int)lwp;
@@ -258,6 +262,7 @@ topData OpenPsinfo(int pid)
 	t_data.res = (int)res;
 	strcpy(t_data.command, command);
 	strcpy(t_data.time, t_result);
+	strcpy(t_data.username, (char*)pw->pw_name);
 	close(fd);
 
 	return t_data; //정보를 담은 topData 구조체 반환
@@ -269,7 +274,7 @@ void SearchData(char *str, topData *data)
 {
 	int i = 0; //반복문 제어 변수
 	int tf = -1; //검색할 항목이 pid라면 0, command라면 1
-	char cmp[2][20] = {"pid", "command"}; //str 문자열과 비교를 위한 배열
+	char cmp[3][20] = {"pid", "command", "username"}; //str 문자열과 비교를 위한 배열
 	int value; //pid로 검색한다면 찾을 pid를 입력받는다.
 	char strValue[20];//command로 검색한다면 찾을 command를 입력받는다.
 	int flag; //프로세스가 존재하는 지 여부를 체크
@@ -281,6 +286,8 @@ void SearchData(char *str, topData *data)
 		tf = 0;
 	if( !strcmp(str, cmp[1]) )
 		tf = 1;
+	if( !strcmp(str, cmp[2]) )
+		tf = 2;
 
 	switch(tf){
 		case 0: //검색할 pid를 입력받는다
@@ -290,6 +297,11 @@ void SearchData(char *str, topData *data)
 			break;
 		case 1: //검색할 command를 입력받는다
 			printf("input COMMAND : ");
+			scanf("%s", strValue);
+			ClearReadBuffer();
+			break;
+		case 2: //검색할 command를 입력받는다
+			printf("input USERNAME : ");
 			scanf("%s", strValue);
 			ClearReadBuffer();
 			break;
@@ -307,6 +319,12 @@ void SearchData(char *str, topData *data)
 				break;
 			case 1: //command로 검색
 				if( !strcmp(data[i].command, strValue) ){
+					PrintProcess(data[i]);
+					flag = 1;
+				}
+				break;
+			case 2: //username으로 검색
+				if( !strcmp(data[i].username, strValue) ){
 					PrintProcess(data[i]);
 					flag = 1;
 				}
