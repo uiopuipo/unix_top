@@ -146,22 +146,22 @@ void PrintMainInfo(){
 }
 
 //프로세스 정보 출력
-//signal로 초기화, 이전/현재/다음 페이지 명령을 구분한다
-void PrintPsInfo(topData *data, int signal) {
+//flag로 초기화, 이전/현재/다음 페이지 명령을 구분한다
+void PrintPsInfo(topData *data, int flag) {
 	static int currentIndex=0;
 	static int page = 1;
 	int i;
 	int processCount = GetDataSize(data);
 	
 	// 새로고침 할 시 초기화
-	if(signal == INIT_PAGE){ //초기화일때
+	if(flag == INIT_PAGE){ //초기화일때
 		currentIndex =0;//현재 index 0
 		page = 1;//page 1로 만듬
-		signal = CURRENT_PAGE; //현재 페이지를 출력하기위해 시그널을 바꿈.
+		flag = CURRENT_PAGE; //현재 페이지를 출력하기위해 시그널을 바꿈.
 	}
 
 	//현재 페이지
-	if(signal == CURRENT_PAGE){
+	if(flag  == CURRENT_PAGE){
 		for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++){//현재 페이지를 출력
 			if(i < processCount){//출력하는 개수가 프로세스 개수를 안넘으면
 				PrintProcess(data[i]);//출력
@@ -172,7 +172,7 @@ void PrintPsInfo(topData *data, int signal) {
 	}
 
 	//다음 페이지
-	if(signal == FRONT_PAGE){
+	if(flag == FRONT_PAGE){
 		if(currentIndex + MAX_SHOW_PROCESS >= processCount) { //맨 뒷부분이면
 			for(i=currentIndex;i< page * MAX_SHOW_PROCESS;i++){ //현 위치에서
 				if(i < processCount){//출력하는 개수가 프로세스 개수를 안넘으면
@@ -195,7 +195,7 @@ void PrintPsInfo(topData *data, int signal) {
 	}
 
 	//이전 페이지
-	if(signal == BACK_PAGE){
+	if(flag == BACK_PAGE){
 		if(currentIndex < MAX_SHOW_PROCESS) {//첫 페이지면 그냥 출력
 			for(i=currentIndex; i < page * MAX_SHOW_PROCESS; i++)
 					PrintProcess(data[i]);

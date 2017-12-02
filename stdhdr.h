@@ -17,12 +17,12 @@
 #include <sys/uio.h>
 
 //define
-//OptSort()함수의 signal
+//OptSort()함수의flag 
 #define SORT_SIZE 1 //size별로 정렬할 때
 #define SORT_PID 2 //pid별로 정렬할 때
 #define SORT_RES 3 //res별로 정렬할 때
 
-//PrintPsInfo()함수의 signal
+//PrintPsInfo()함수의flag 
 #define FRONT_PAGE 1 //이후 페이지로 넘어갈 때 
 #define BACK_PAGE 2 //이전 페이지로 넘길 때
 #define INIT_PAGE 3 //업데이트 할 시 초기화
@@ -46,7 +46,7 @@ typedef struct top {
 
 //funciton
 void SearchData(char *str, topData *data); //특정 프로세스 정보를 찾기위한 함수.
-void PrintPsInfo(topData *data, int signal); //프로세스 정보를 출력한다.
+void PrintPsInfo(topData *data, int flag); //프로세스 정보를 출력한다.
 void PrintMainInfo(); //top 프로그램의 기본 정보 및 주요내용 출력
 void GetPsInfo(topData *data); //data에 프로세스 정보 받아오기.
 struct top OpenPsinfo(int pid); //process의 정보를 열기.
