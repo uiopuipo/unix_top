@@ -18,6 +18,10 @@ int main(void) {
 		PrintMainInfo();
 		//옵션처리
 		switch(optionChoice) {
+			case 'q': //프로그램 종료
+				system("clear");
+				exit(1);
+				break;
 			case 'k': //프로세스 종료 옵션
 				PrintPsInfo(data, CURRENT_PAGE);
 				OptKill(); //프로세스에 SIGKILL 시그널을 보낸다
@@ -72,10 +76,6 @@ int main(void) {
 				break;
 			case 'h': //도움말
 				PrintHelpInfo();
-				break;
-			case 'q': //프로그램 종료
-				system("clear");
-				exit(1);
 				break;
 			default :
 				PrintPsInfo(data, CURRENT_PAGE);

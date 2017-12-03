@@ -28,12 +28,10 @@
 #define BACK_PAGE 2 //이전 페이지로 넘길 때
 #define INIT_PAGE 3 //업데이트 할 시 초기화
 #define CURRENT_PAGE 4 //현재 페이지를 출력하고 싶을 때
+#define MAX_SHOW_PROCESS 15 //한 페이지에 보여줄 프로세스의 개수
 
-//받아올 프로세스 한정치
+//data배열에 받아올 프로세스의 최대 개수
 #define MAX_DATA_SIZE 400
-
-//PrintPsInfo()함수의 프로세스 보여줄 값
-#define MAX_SHOW_PROCESS 15
 
 //화면에 보여줄 top 구조체 요소.
 typedef struct top {
@@ -52,13 +50,10 @@ void PrintPsInfo(topData *data, int flag); //프로세스 정보를 출력한다.
 void PrintMainInfo(); //top 프로그램의 기본 정보 및 주요내용 출력
 void GetPsInfo(topData *data); //data에 프로세스 정보 받아오기.
 struct top OpenPsinfo(int pid); //process의 정보를 열기.
-void ChangePos(topData *a, topData *b); //구조체 바꾸기
 void ClearReadBuffer(); //버퍼를 비우기 위한 함수.
 void InitData(topData *data); //Data의 배열을 초기화 하기위한 함수
 int GetDataSize(topData *data); //프로세스 개수 구하는 함수
 void PrintHelpInfo(); //Top 사용법과 옵션 설명
-
-//option function
 void OptKill(); //특정 프로세를 종료시키기 위한 함수
-int OptSort(topData *data,int size, int flag);
+int OptSort(topData *data,int size, int flag);//정렬하기위한 옵션 함수
 #endif
