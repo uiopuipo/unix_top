@@ -16,6 +16,7 @@
 #include <sys/param.h>
 #include <sys/syscall.h>
 #include <sys/uio.h>
+#include <sys/resource.h>
 
 //define
 //OptSort()함수의flag 
@@ -41,7 +42,14 @@ typedef struct top {
 	char time[8]; //시간
 	int size; //프로세스에 할당된 총 메모리의 양
 	int res; //프로세스에 의해 사용된 물리 메모리의 양
+	int nice;
+	double percpu;
+	double permem;
+	char state;
 	char username[64]; //사용자 이름
+
+
+	
 } topData;
 
 //funciton

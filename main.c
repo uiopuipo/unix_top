@@ -64,10 +64,6 @@ int main(void) {
 					SearchData(str, data); //pid 또는 command로 검색
 				}
 				break;
-			case 'r': //새로고침
-				GetPsInfo(data);
-				PrintPsInfo(data, INIT_PAGE);
-				break;
 			case 'n': //화면 넘기기
 				PrintPsInfo(data, FRONT_PAGE);
 				break;
@@ -81,8 +77,6 @@ int main(void) {
 				PrintPsInfo(data, CURRENT_PAGE);
 				break;
 		}
-	//	PrintPsInfo(data, CURRENT_PAGE);
-	//	GetPsInfo(data); //process정보를 data에 얻어온다. 여기다 이걸 넣어버리면, 업데이트 기능이 필요가없다.. 일단 주석처리
 	}
 	return 0;
 }

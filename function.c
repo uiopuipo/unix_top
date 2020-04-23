@@ -101,11 +101,6 @@ int GetDataSize(topData *data){
 	return count;
 }
 
-//프로세스 정보를 넣어둔 topData 구조체를 받아 내용을 출력한다.
-void PrintProcess(topData data){
-	printf(" PID:%-6d  USERNAME:%-10s  LWP:%-4d  SIZE:%-6d  RES:%-6d  TIME:%-6s  COMMAND:%-10s\n " ,data.pid, data.username, data.lwp, data.size, data.res, data.time, data.command);
-}
-
 // /proc 디렉토리를 순회하면서 각 pid마다 파일을 열어 정보를 얻어올 준비를 한다.
 void GetPsInfo(topData *data){
 	DIR *dp; //디렉토리 포인터
@@ -134,14 +129,20 @@ void GetPsInfo(topData *data){
 	}
 }
 
+//프로세스 정보를 넣어둔 topData 구조체를 받아 내용을 출력한다.
+void PrintProcess(topData data){
+	printf(" %-4d %-8s %-4d %-4d %-6d %-6d %-5s %-6c %-4.2lf %-4.2lf %-10s\n " ,data.pid, data.username, data.lwp, data.nice, data.size, data.res, data.time, data.state, data.percpu, data.permem, data.command);
+}
+
+
 //top프로그램 화면 위에 보여주는 부분 출력
 void PrintMainInfo(){
-	printf("----------------------------------------------------------------------------------\n");
-	printf("                                   Top program            \n");
-	printf("                                  Help press 'h'          \n");
-	printf("----------------------------------------------------------------------------------\n");
+	printf("  ---------------------------------------\n");
+	printf("                 Top program             \n");
+	printf("                Help press 'h'           \n");
+	printf("  ---------------------------------------\n");
 	
-	printf("    PID         USERNAME              LWP       SIZE         RES         TIME          COMMAND\n ");
+	printf("  PID  USERNAME NLWP NICE SIZE   RES    TIME  STATE  CPU  MEM  COMMAND\n ");
 }
 
 //프로세스 정보 출력
@@ -226,8 +227,12 @@ topData OpenPsinfo(int pid)
 	int res; //프로세스에 의해 사용된 물리 메모리의 양
 	timestruc_t time; //프로세스가 사용한 CPU 시간
 	int hour, min; //time에서 시간, 분을 빼올 변수
-	char t_result[8]; //hour + min을 문자열로 저장yy
+	char t_result[8]; //hour + min을 문자열로 저장
 	int uid; //사용자 이름을 얻기 위해 uid를 얻는다.
+	int nice; //우선순위
+	char state;
+	double cpu;
+	double mem;
 	
 	memset(&data, 0, sizeof(psinfo_t)); //구조체 초기화
 	sprintf(fileName, "/proc/%d/psinfo", pid); //여러 pid를 처리하기 위해 문자열을 만든다.
@@ -245,7 +250,11 @@ topData OpenPsinfo(int pid)
 	res = data.pr_rssize;
 	time = data.pr_time;
 	hour = time.tv_sec / 60;
-	min = time.tv_sec % 60; 
+	min = time.tv_sec % 60;
+	nice = getpriority(PRIO_PROCESS, pid);
+	cpu = data.pr_pctcpu;
+	mem = data.pr_pctmem;
+	state = data.pr_lwp.pr_sname;
 	if(min < 10) //hour + min을 문자열로 저장
 		sprintf(t_result, "%d:0%d", hour, min);
 	else 
@@ -263,6 +272,10 @@ topData OpenPsinfo(int pid)
 	strcpy(t_data.command, command);
 	strcpy(t_data.time, t_result);
 	strcpy(t_data.username, (char*)pw->pw_name);
+	t_data.nice = nice;
+	t_data.percpu = cpu/0x8000*100;
+	t_data.permem = mem/0x8000*100;
+	t_data.state = state;
 	close(fd);
 
 	return t_data; //정보를 담은 topData 구조체 반환
